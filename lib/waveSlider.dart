@@ -24,9 +24,9 @@ class _WaveSliderState extends State<WaveSlider>
 
   @override
   void initState() {
+    super.initState();
     _controller = WaveSliderController(vsync: this)
       ..addListener(() => setState(() {}));
-    super.initState();
   }
 
   @override
@@ -55,20 +55,19 @@ class _WaveSliderState extends State<WaveSlider>
   void _onDragUpdate(BuildContext context, DragUpdateDetails details) {
     RenderBox? box = context.findRenderObject() as RenderBox;
     Offset offset = box.globalToLocal(details.globalPosition);
-    _controller!.setStateToSliding();
+    _controller?.setStateToSliding();
     _updateDragPosition(offset);
   }
 
   void _onDragStart(BuildContext context, DragStartDetails start) {
     RenderBox? box = context.findRenderObject() as RenderBox;
     Offset offset = box.globalToLocal(start.globalPosition);
-    _controller!.setStateToStart();
+    _controller?.setStateToStart();
     _updateDragPosition(offset);
   }
 
   void _onDragEnd(BuildContext context, DragEndDetails end) {
-    _controller!.setStateToStopping();
-
+    _controller?.setStateToStopping();
     setState(() {});
   }
 
@@ -85,12 +84,22 @@ class _WaveSliderState extends State<WaveSlider>
           width: widget.width,
           height: widget.height,
           child: CustomPaint(
-            painter: WavePainter(
-                animationProgress: _controller!.progress,
-                waveState: _controller!.state,
-                color: Colors.black,
-                dragPercentage: _dragPercentage,
-                sliderPosition: _dragPosition),
+            painter:
+                // ?  tt calss
+                // WavePainter(
+                //   animationProgress: _controller!.progress,
+                //   color: Colors.black,
+                //   dragPercentage: _dragPercentage,
+                //   sliderPosition: _dragPosition,
+                //   sliderState: _controller!.state),
+                /// ? normal wave
+                WavePainter(
+              animationProgress: _controller!.progress,
+              sliderState: _controller!.state,
+              color: Colors.black,
+              dragPercentage: _dragPercentage,
+              sliderPosition: _dragPosition,
+            ),
           ),
         ));
   }
@@ -126,23 +135,24 @@ class WaveSliderController extends ChangeNotifier {
     }
   }
 
-  void startAnimation() {
-    controller.duration = const Duration(microseconds: 800);
+  void _startAnimation() {
+    controller.duration = const Duration(milliseconds: 500);
     controller.forward(from: 0.0);
     notifyListeners();
   }
 
   setStateToResting() {
     _state = WaveState.resting;
+    notifyListeners();
   }
 
   setStateToStart() {
-    startAnimation();
+    _startAnimation();
     _state = WaveState.starting;
   }
 
   setStateToStopping() {
-    startAnimation();
+    _startAnimation();
     _state = WaveState.stopping;
   }
 
